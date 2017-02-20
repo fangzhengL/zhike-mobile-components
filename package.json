@@ -1,10 +1,15 @@
 {
   "name": "zhike-mobile-components",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "files": [
-    "img"
+    "img",
+    "EmptyView.js",
+    "LoadingView.js",
+    "SimpleCalendar.js",
+    "ZKSeparatorLine.js",
+    "ZKTextInput.js"
   ],
   "dependencies": {
     "zhike-mobile-utils": "^1.0.0",
