@@ -13,7 +13,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-const loadingImage = require('../../app/img/img-loading.gif');
+const loadingImage = require('./img/img-loading.gif');
 
 export default function LoadingView(props:Object) {
   return (
