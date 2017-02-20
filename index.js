@@ -1,18 +1,22 @@
 // @flow
 //
-import EmptyView from './EmptyView';
-import LoadingView from './LoadingView';
-import SimpleCalendar from './SimpleCalendar';
-import SeparatorLine from './ZKSeparatorLine';
-import TextInput from  './ZKTextInput';
+import EmptyView_ from './EmptyView';
+import LoadingView_ from './LoadingView';
+import SimpleCalendar_ from './SimpleCalendar';
+import SeparatorLine_ from './ZKSeparatorLine';
+import TextInput_ from  './ZKTextInput';
 
-const ex = {
+export const EmptyView = EmptyView_;
+export const LoadingView = LoadingView_;
+export const SimpleCalendar = SimpleCalendar_;
+export const SeparatorLine = SeparatorLine_;
+export const TextInput = TextInput_;
+
+export default {
   EmptyView,
   LoadingView,
   SimpleCalendar,
   SeparatorLine,
   TextInput,
 };
-
-export default ex;
 
