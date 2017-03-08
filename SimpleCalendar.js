@@ -1,3 +1,5 @@
+// @flow
+
 import React, {
   Component,
   PropTypes,
@@ -13,9 +15,8 @@ import {
 } from 'react-native';
 import _ from 'lodash';
 
-const { width: ScreenWidth, height:ScreenHeight } = Dimensions.get('window');
+const { width: ScreenWidth } = Dimensions.get('window');
 const DateCellWidth = ScreenWidth / 7.0 - 20;
-const SelectedDatePointer = require('./img/ic-calendar-pointer.png');
 
 export default class SimpleCalendar extends Component {
   static _daysInCurrentWeek() {
@@ -53,7 +54,7 @@ export default class SimpleCalendar extends Component {
     }
   )();
 
-  static _compareDate(d1, d2) {
+  static _compareDateByDay(d1, d2) {
     if (d1.getFullYear() < d2.getFullYear()) {
       return -1;
     } else if (d1.getFullYear() > d2.getFullYear()) {
@@ -67,59 +68,64 @@ export default class SimpleCalendar extends Component {
     }
   }
 
-  static _isDateEqual(d1, d2) {
-    return this._compareDate(d1, d2) === 0;
+  static _isDateEqualByDay(d1, d2) {
+    return this._compareDateByDay(d1, d2) === 0;
   }
 
   static _isFuture(d) {
-    return this._compareDate(new Date(), d) < 0;
+    return this._compareDateByDay(new Date(), d) < 0;
   }
 
   static propTypes = {
     onDateSelected: PropTypes.func,
-    // dates equal accuracy: day, defaults to today
-    date: PropTypes.object,  // eslint-disable-line
-    backgroundImageSource: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
-    selectedPointer: PropTypes.oneOfType([
-      PropTypes.number, PropTypes.object
-    ])
+    date: PropTypes.instanceOf(Date),  // eslint-disable-line
   };
 
   static defaultProps = {
     date: new Date(),
-    selectedPointer: SelectedDatePointer,
   };
 
-  constructor(props) {
+  static _futureDateTextStyle() {
+    return {
+      color: '#8f9ba6',
+      fontSize: 14,
+    };
+  }
+
+
+  state: {
+    weekOffset: number,
+    lastWeekdays: number,
+    currentWeekdays: number,
+    nextWeekdays: number,
+  }
+  _onScrollEnd:(e:any) => void
+  scrollView: any
+
+  constructor(props:any) {
     super(props);
     this.state = {
-      measuredSize: null,
       // weekOffset restrained to be positive
       weekOffset: 0,
       ...SimpleCalendar._lastCurrentNextWeekdays(0),
     };
-    this._onContainerLayout = this._onContainerLayout.bind(this);
-    this._onDayContainerLayout = this._onDayContainerLayout.bind(this);
     this._onScrollEnd = this._onScrollEnd.bind(this);
+  }
 
-    this._lastOffsetX = 0;
+  componentDidMount() {
+    this._adjustScroll();
   }
 
   _isSelectedDate(d1) {
-    return this.constructor._isDateEqual(d1, this.props.date);
+    return this.constructor._isDateEqualByDay(d1, this.props.date);
   }
-
-  _isSelectedDayOfWeek(dayOfWeek: number) {
-    return this.props.date.getDay() === dayOfWeek;
-  }
-
 
   _onScrollEnd(e) {
     const newOffset = e.nativeEvent.contentOffset.x;
     const nextState = {};
-    if (newOffset - this._lastOffsetX > 1) {
+    if (newOffset - ScreenWidth > 0) {
       nextState.weekOffset = this.state.weekOffset + 1;
-    } else if (newOffset - this._lastOffsetX < -1) {
+    } else if (newOffset - ScreenWidth < 0) {
       nextState.weekOffset = this.state.weekOffset - 1;
     }
     this.setState(
@@ -128,29 +134,8 @@ export default class SimpleCalendar extends Component {
     );
   }
 
-  _onContainerLayout(e) {
-    const layout = e.nativeEvent.layout;
-    console.log(layout);
-    this.setState(
-      {
-        measuredSize: {
-          width: layout.width,
-          height: layout.height,
-        }
-      },
-      () => this._adjustScroll()
-    );
-  }
-
-  _onDayContainerLayout(e) {
-    const layout = e.nativeEvent.layout;
-    console.log('fuck: ', layout);
-    this.setState({
-      dayContainerSize: {
-        width: layout.width,
-        height: layout.height,
-      }
-    });
+  _adjustScroll() {
+    this.scrollView && this.scrollView.scrollTo({ x:ScreenWidth, animated:false });
   }
 
   _onSelectDate(date) {
@@ -164,75 +149,54 @@ export default class SimpleCalendar extends Component {
     return this.props.date.getDay();
   }
 
-  _futureDateTextStyle() {
-    return {
-      color: '#8f9ba6',
-      fontSize: 14,
-    };
-  }
-
-  _renderWeekdays(weekdays: Array<Date>, offsetKey = 0) {
+  _renderWeekdays(weekdays: Array<Date>, selectedDate:Date) {
     const today = new Date();
     return weekdays.map(
       (d, ii) => (
         <TouchableWithoutFeedback
-          key={`weekdays-${offsetKey}-${ii}`}
+          key={`weekdays-${ii}`}
           onPress={() => this._onSelectDate(d)}
         >
           <View
             style={{
-              marginLeft:6,
-              marginRight:6,
               alignSelf:'stretch',
               width:DateCellWidth,
               overflow:'visible',
-              marginBottom: 10,
+              paddingBottom: 15,
+              justifyContent:'flex-end',
               alignItems:'center',
+              backgroundColor:'transparent',
             }}
           >
-            {
-              this._isSelectedDate(d) ? (
-                <Image
-                  source={this.props.selectedPointer}
-                  style={{
-                    position:'absolute',
-                    bottom:-12,
-                    left:0,
-                    right:0,
-                    height:this.state.barHeight || 0,
-                    width: undefined,
-                  }}
-                  resizeMode={Image.resizeMode.cover}
-                />
-              ) : null
-            }
-            <Text
+            <View
               style={[
-                { fontSize:14, color:'#ffffff', backgroundColor:'transparent' },
-                this.constructor._isFuture(d) ? this._futureDateTextStyle() : null,
+                {
+                  width:30,
+                  height:30,
+                  borderRadius:15,
+                  backgroundColor:'#fe663b',
+                  justifyContent:'center',
+                  alignItems:'center',
+                },
+                this.constructor._isDateEqualByDay(d, selectedDate) ? null : {
+                  backgroundColor:'transparent'
+                }
               ]}
             >
-              {`${this.constructor._isDateEqual(d, today) ? '今日' : d.getDate()}`}
-            </Text>
+              <Text
+                style={[
+                  { fontSize:14, lineHeight:20, color:'#2e3236', backgroundColor:'transparent' },
+                  this.constructor._isFuture(d) ? this.constructor._futureDateTextStyle() : null,
+                  this.constructor._isDateEqualByDay(d, selectedDate) ? { color:'white' } : null,
+                ]}
+              >
+                {`${this.constructor._isDateEqualByDay(d, today) ? '今日' : d.getDate()}`}
+              </Text>
+            </View>
           </View>
         </TouchableWithoutFeedback>
       )
     );
-  }
-
-  _adjustScroll() {
-    const offsetX = this.state.measuredSize.width;
-    this.scrollView && this.scrollView.scrollTo({ x:offsetX, animated:false });
-    this._lastOffsetX = offsetX;
-  }
-
-  _measuredSize() {
-    if (!this.state.measuredSize) return null;
-    const ret = {
-      width: this.state.measuredSize.width,
-      height: this.state.dayContainerSize && this.state.dayContainerSize.height || this.state.measuredSize.height || 0,
-    };
-    return ret;
   }
 
   render() {
@@ -240,85 +204,9 @@ export default class SimpleCalendar extends Component {
     return (
       <View
         style={[styles.container, this.props.style]}
-        onLayout={
-          ({ nativeEvent }) => this.setState({
-            barHeight:nativeEvent && nativeEvent.layout && nativeEvent.layout.height
-          })
-        }
       >
-        {
-          this.props.backgroundImageSource ?
-            <Image
-              style={{
-                position:'absolute',
-                height:undefined,
-                width:undefined,
-                left:0,
-                right:0,
-                top:0,
-                bottom:0
-              }}
-              source={this.props.backgroundImageSource}
-            /> : null
-        }
-        {
-          this.state.dayContainerSize ? (
-            <ScrollView
-              ref={ref => (this.scrollView = ref)}
-              style={[styles.scrollView, this._measuredSize()]}
-              scrollEventThrottle={16}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              onMomentumScrollEnd={this._onScrollEnd}
-              onLayout={() => this._adjustScroll()}
-              overflow={'visible'}
-            >
-              {
-                <View
-                  style={[styles.datePage, this._measuredSize()]}
-                >
-                  {
-                    this._renderWeekdays(weekdays.lastWeekdays)
-                  }
-                </View>
-              }
-              {
-                <View
-                  style={[styles.datePage, this._measuredSize()]}
-                >
-                  {
-                    this._renderWeekdays(weekdays.currentWeekdays)
-                  }
-                </View>
-              }
-              {
-                this.state.weekOffset < 0 ?
-                  <View
-                    style={[styles.datePage, this._measuredSize()]}
-                  >
-                    {
-                    this._renderWeekdays(weekdays.nextWeekdays)
-                  }
-                  </View>
-                : null
-              }
-            </ScrollView>
-          ) : (
-            <View
-              style={[styles.datePage]}
-              onLayout={this._onDayContainerLayout}
-            >
-              {
-                this._renderWeekdays(weekdays.currentWeekdays)
-              }
-            </View>
-          )
-        }
-
         <View
-          style={[styles.datePage, { marginBottom:9 }]}
-          onLayout={this._onContainerLayout}
+          style={[styles.datePage, { position:'absolute', left:0, top:0, right:0, paddingTop:13 }]}
         >
           {
             _.range(7).map(ii => SimpleCalendar._dayString(ii)).map(
@@ -330,20 +218,12 @@ export default class SimpleCalendar extends Component {
                   <View
                     style={{
                       width: DateCellWidth,
-                      marginLeft:6,
-                      marginRight:6,
-                      justifyContent:'center',
                       alignItems: 'center',
                     }}
                   >
                     <Text
                       style={[
-                        {
-                          fontSize:14,
-                          color:'#ffffff',
-                          backgroundColor:'transparent',
-                        },
-                        (this.state.weekOffset === 0 && ii > new Date().getDay()) && this._futureDateTextStyle(),
+                        { fontSize:12, lineHeight:17, color:'#8f9da5', },
                       ]}
                     >
                       {dayString}
@@ -354,6 +234,44 @@ export default class SimpleCalendar extends Component {
             )
           }
         </View>
+        <ScrollView
+          ref={ref => (this.scrollView = ref)}
+          style={[styles.scrollView, ]}
+          scrollEventThrottle={16}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={this._onScrollEnd}
+          overflow={'visible'}
+          creditsContainerStyle={{ alignItems:'flex-end', }}
+        >
+          <View
+            style={[styles.datePage, { alignItems:'flex-end' }]}
+          >
+            {
+              this._renderWeekdays(weekdays.lastWeekdays, this.props.date)
+            }
+          </View>
+          <View
+            style={[styles.datePage, { alignItems:'flex-end', }]}
+          >
+            {
+              this._renderWeekdays(weekdays.currentWeekdays, this.props.date)
+            }
+          </View>
+          {
+            this.state.weekOffset < 0 ?
+              <View
+                style={[styles.datePage, { alignItems:'flex-end' }]}
+              >
+                {
+                this._renderWeekdays(weekdays.nextWeekdays, this.props.date)
+              }
+              </View>
+            : null
+          }
+        </ScrollView>
+
       </View>
     );
   }
@@ -363,17 +281,18 @@ export default class SimpleCalendar extends Component {
 const styles = StyleSheet.create({
   container: {
     alignSelf: 'stretch',
-    flexDirection: 'column-reverse',
     paddingTop: 10,
+    height:83,
   },
   scrollView: {
     alignSelf: 'stretch',
+    flex:1,
   },
   datePage: {
     justifyContent:'space-between',
     flexDirection:'row',
-    paddingLeft:9,
-    paddingRight:9,
-    alignSelf:'stretch',
+    width:ScreenWidth,
+    paddingLeft:17,
+    paddingRight:17,
   },
 });
