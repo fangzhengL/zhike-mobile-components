@@ -77,6 +77,7 @@ export default class SimpleCalendar extends Component {
   }
 
   static propTypes = {
+    textForToday:PropTypes.string,
     onDateSelected: PropTypes.func,
     date: PropTypes.instanceOf(Date),  // eslint-disable-line
   };
@@ -190,7 +191,7 @@ export default class SimpleCalendar extends Component {
                   this.constructor._isDateEqualByDay(d, selectedDate) ? { color:'white' } : null,
                 ]}
               >
-                {`${this.constructor._isDateEqualByDay(d, today) ? '今日' : d.getDate()}`}
+                {`${(this.constructor._isDateEqualByDay(d, today)  && this.props.textForToday) ? this.props.textForToday : d.getDate()}`}
               </Text>
             </View>
           </View>
