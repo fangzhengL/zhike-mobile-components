@@ -284,6 +284,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     paddingTop: 10,
     height:83,
+    overflow: 'hidden',
   },
   scrollView: {
     alignSelf: 'stretch',
