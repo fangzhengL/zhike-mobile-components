@@ -10,19 +10,45 @@ import React, { PropTypes } from 'react';
 import {
   View,
   Image,
+  Text,
   StyleSheet,
 } from 'react-native';
+import RotatingView from './RotatingView';
 
 const loadingImage = require('./img/img-loading.gif');
 
 export default function LoadingView(props:Object) {
+  let content = (
+    <Image
+      style={props.imageStyle}
+      source={props.image}
+      resizeMode={'contain'}
+    />
+  );
+  if (props.rotationPeriod > 0) {
+    content = (
+      <RotatingView
+        period={props.rotationPeriod}
+      >
+        {content}
+      </RotatingView>
+    );
+  }
   return (
     <View style={[styles.container, props.style]}>
-      <Image
-        style={props.imageStyle}
-        source={props.image}
-        resizeMode={'contain'}
-      />
+      {content}
+      {
+        !props.text ? null : (
+          <Text
+            style={[
+              { color:'#8f9da6', fontSize:14, alignSelf:'center', marginTop:10 },
+              props.textStyle,
+            ]}
+          >
+            {props.text}
+          </Text>
+        )
+      }
     </View>
   );
 }
