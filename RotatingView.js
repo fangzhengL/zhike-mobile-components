@@ -15,7 +15,7 @@ export default class RotatingView extends Component {
 
   static defaultProps = {
     rotating: true,
-    period: 1500,
+    period: 0,
   };
 
   state: {
