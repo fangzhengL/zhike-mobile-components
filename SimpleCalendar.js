@@ -76,6 +76,10 @@ export default class SimpleCalendar extends Component {
     return this._compareDateByDay(new Date(), d) < 0;
   }
 
+  static _thisSunday(date) {
+    return new Date(new Date(date.getTime()).setDate(date.getDate() - date.getDay()));
+  }
+
   static propTypes = {
     textForToday:PropTypes.string,
     onDateSelected: PropTypes.func,
@@ -105,11 +109,21 @@ export default class SimpleCalendar extends Component {
 
   constructor(props:any) {
     super(props);
+
+    const now = new Date();
+    const nowSunday = this.constructor._thisSunday(now);
+    nowSunday.setHours(0, 0, 0, 0);
+    const cur = props.date;
+    const curSunday = this.constructor._thisSunday(cur);
+    curSunday.setHours(0, 0, 0, 0);
+    const weekOffset = Math.round((curSunday.getTime() - nowSunday.getTime()) / 1000 / 3600 / 24 / 7);
+
     this.state = {
       // weekOffset restrained to be positive
-      weekOffset: 0,
-      ...SimpleCalendar._lastCurrentNextWeekdays(0),
+      weekOffset,
+      ...SimpleCalendar._lastCurrentNextWeekdays(weekOffset),
     };
+
     this._onScrollEnd = this._onScrollEnd.bind(this);
   }
 
