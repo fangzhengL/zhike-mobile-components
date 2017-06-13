@@ -5,6 +5,7 @@ import LoadingView_ from './LoadingView';
 import SimpleCalendar_ from './SimpleCalendar';
 import SeparatorLine_ from './ZKSeparatorLine';
 import TextInput_ from  './ZKTextInput';
+import AnimatedAlertContainer from './AnimatedAlertContainer';
 
 export const EmptyView = EmptyView_;
 export const LoadingView = LoadingView_;
@@ -18,5 +19,6 @@ export default {
   SimpleCalendar,
   SeparatorLine,
   TextInput,
+  AnimatedAlertContainer,
 };
 
