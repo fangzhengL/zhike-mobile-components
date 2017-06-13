@@ -1,6 +1,6 @@
 {
   "name": "zhike-mobile-components",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "",
   "main": "index.js",
   "files": [
@@ -11,7 +11,7 @@
     "ZKSeparatorLine.js",
     "ZKTextInput.js",
     "RotatingView.js",
-    "AnimatedAlertContainer"
+    "AnimatedAlertContainer.js"
   ],
    "peerDependencies": {
      "lodash": "^4.17.2",
