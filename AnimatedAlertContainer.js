@@ -71,14 +71,14 @@ export default class AnimatedAlertContainer extends Component {
     ).start();
   }
 
-  hide() {
+  hide(ctx:any) {
     Animated.timing(
       this.progress,
       {
         toValue:0,
         duration:250,
       }
-    ).start(() => (this.props.onHide && this.props.onHide()));
+    ).start(() => (this.props.onHide && this.props.onHide(ctx)));
   }
 
   render() {
