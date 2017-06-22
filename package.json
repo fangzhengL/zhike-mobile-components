@@ -1,6 +1,6 @@
 {
   "name": "zhike-mobile-components",
-  "version": "2.1.4",
+  "version": "1.1.4",
   "description": "",
   "main": "index.js",
   "files": [
@@ -13,9 +13,9 @@
     "RotatingView.js",
     "AnimatedAlertContainer.js"
   ],
-   "peerDependencies": {
-     "lodash": "^4.17.2",
-     "zhike-mobile-utils": "^2.0.0"
+  "dependencies": {
+    "zhike-mobile-utils": "^1.0.0",
+    "lodash": "^4.17.2"
    },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
