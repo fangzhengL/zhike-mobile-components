@@ -43,12 +43,15 @@ export default function EmptyView(props:Object) {
             onPress={props.onPress}
           >
             <View
-              style={{
-                borderRadius:2,
-                borderColor:'gray',
-                borderWidth:1,
-                marginTop: 10,
-              }}
+              style={[
+                {
+                  borderRadius: 2,
+                  borderColor: 'gray',
+                  borderWidth: 1,
+                  marginTop: 10,
+                },
+                props.actionButtonStyle
+              ]}
             >
               <Text
                 style={[
@@ -59,7 +62,8 @@ export default function EmptyView(props:Object) {
                     marginBottom:5,
                     marginLeft:8,
                     marginRight:8,
-                  }
+                  },
+                  props.actionButtonTextStyle
                 ]}
               >
                 {'重新加载'}
@@ -83,6 +87,8 @@ EmptyView.propTypes = {
   ]),
   message: PropTypes.string,
   messageStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
+  actionButtonStyle: View.propTypes.style,
+  actionButtonTextStyle: Text.propTypes.style,
 };
 
 const styles = StyleSheet.create({
