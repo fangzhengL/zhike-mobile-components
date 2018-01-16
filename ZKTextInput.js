@@ -5,7 +5,9 @@
 * @Email:  betterofsong@gmail.com
 */
 
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
 import {
   TextInput,
   View,
